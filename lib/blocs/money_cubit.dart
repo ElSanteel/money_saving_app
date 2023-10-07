@@ -60,5 +60,5 @@ class MoneyCubit extends Cubit<MoneyState> {
     SharedPreferenceHelper.removeData(key: 'total');
   }
 
-  double balance = 2000;
+  double balance = 4000;
 }
