@@ -4,10 +4,7 @@ import 'package:shared_prefrence_session/src/app_root.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPrefrenceHelper.init();
+  SharedPreferenceHelper.init();
 
   runApp(const AppRoot());
 }
-
-
-

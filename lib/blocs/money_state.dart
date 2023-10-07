@@ -4,4 +4,7 @@ part of 'money_cubit.dart';
 abstract class MoneyState {}
 
 class MoneyInitial extends MoneyState {}
+
 class AddToProductsState extends MoneyState {}
+
+class TotalState extends MoneyState {}

@@ -36,19 +36,15 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   dynamic route() {
-    if (SharedPrefrenceHelper.getData(key: "Email") == null) {
+    if (SharedPreferenceHelper.getData(key: "Email") == null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
-        ),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const MoneyTrackerScreen(),
-        ),
+        MaterialPageRoute(builder: (context) => const MoneyTrackerScreen()),
       );
     }
   }

@@ -12,16 +12,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey();
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
-  var usernameController =
-      TextEditingController(); // Add this line for the username
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.green.shade200,
       body: Form(
         key: _formKey,
@@ -34,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const Align(
                 alignment: Alignment.center,
                 child: Text(
-                  'Hello , please Login',
+                  'Hello Jim, please Login',
                   style: TextStyle(
                     fontSize: 20,
                     color: Colors.white,
@@ -63,15 +60,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 100,
                       height: 150,
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextLoginField(Icons.person, 'Username', usernameController,
-                        (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your username';
-                      }
-                    }),
                     const SizedBox(
                       height: 10,
                     ),
@@ -106,12 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: MaterialButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            SharedPrefrenceHelper.saveData(
+                            SharedPreferenceHelper.saveData(
                                 key: "Email", value: emailController.text);
-                            SharedPrefrenceHelper.saveData(
-                                key: "Username",
-                                value: usernameController
-                                    .text); // Save the username
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(

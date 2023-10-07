@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_prefrence_session/core/size_config.dart';
 
 class CongratsScreen extends StatelessWidget {
-  const CongratsScreen({super.key});
+  final double difference; // Receive the difference as a parameter
+
+  const CongratsScreen({Key? key, required this.difference}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,17 +32,18 @@ class CongratsScreen extends StatelessWidget {
                   color: const Color(0xfff9f9f9),
                   border: Border.all(width: 0.05),
                   borderRadius: BorderRadius.circular(30)),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.verified,
                     color: Colors.blueAccent,
                     size: 45,
                   ),
                   Text(
-                    "\$324",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    "\$${difference.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                        fontSize: 25, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

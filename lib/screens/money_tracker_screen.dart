@@ -8,32 +8,39 @@ import '../components/custom_text_field.dart';
 import '../core/size_config.dart';
 import 'congrats_screen.dart';
 
-class MoneyTrackerScreen extends StatelessWidget {
+class MoneyTrackerScreen extends StatefulWidget {
   const MoneyTrackerScreen({super.key});
 
   @override
+  State<MoneyTrackerScreen> createState() => _MoneyTrackerScreenState();
+}
+
+class _MoneyTrackerScreenState extends State<MoneyTrackerScreen> {
+  var nameController = TextEditingController();
+  var priceController = TextEditingController();
+  var imageController = TextEditingController();
+
+  late MoneyCubit cubit;
+
+  @override
+  void initState() {
+    super.initState();
+
+    cubit = MoneyCubit.get(context);
+
+    cubit.total = SharedPreferenceHelper.getData(key: 'total') ?? 0.0;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var name = TextEditingController();
-    var price = TextEditingController();
-    var imageName = TextEditingController();
     return BlocConsumer<MoneyCubit, MoneyState>(
       listener: (context, state) {
         // TODO: implement listener
       },
       builder: (context, state) {
         var cubit = MoneyCubit.get(context);
-        // Calculate the total amount spent
-        double total = cubit.calculateTotal();
+
         return Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CongratsScreen()),
-              );
-            },
-            child: const Icon(Icons.arrow_forward),
-          ),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -43,7 +50,7 @@ class MoneyTrackerScreen extends StatelessWidget {
                     Row(
                       children: [
                         const Text(
-                          "Hi Jim",
+                          "Hi Mo",
                           style: TextStyle(
                               fontSize: 30,
                               color: Color(0xff686a76),
@@ -64,15 +71,66 @@ class MoneyTrackerScreen extends StatelessWidget {
                             Icons.more,
                             color: Color(0xff686a76),
                           ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            SharedPreferenceHelper.removeData(key: "Email");
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                              (route) => false,
+                            );
+                            cubit
+                                .resetTotalAndRemoveFromSharedPreferences(); // Reset the total and remove it from SharedPreferences when logging out
+                          },
+                          icon: const Icon(Icons.logout),
                         )
                       ],
                     ),
                     const SizedBox(
                       height: 15,
                     ),
-                    Row(
+                    const Text(
+                      "Your balance",
+                      style: TextStyle(
+                          fontSize: 22,
+                          color: Color(0xff656576),
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'YoungSerif'),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: SizeConfig.screenWidth! * 0.9,
+                      height: SizeConfig.screenHeight! * 0.1,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(35)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "\$ ${cubit.balance}",
+                            style: const TextStyle(fontSize: 30),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    const Row(
                       children: [
-                        const Text(
+                        Text(
                           "You've already spent",
                           style: TextStyle(
                               fontSize: 22,
@@ -80,18 +138,7 @@ class MoneyTrackerScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               fontFamily: 'YoungSerif'),
                         ),
-                        const Spacer(),
-                        IconButton(
-                            onPressed: () {
-                              SharedPrefrenceHelper.removeData(key: "Email");
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginScreen(),
-                                  ),
-                                  (route) => false);
-                            },
-                            icon: const Icon(Icons.logout))
+                        Spacer(),
                       ],
                     ),
                     const SizedBox(
@@ -100,18 +147,23 @@ class MoneyTrackerScreen extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          width: SizeConfig.screenWidth! * 0.42,
+                          width: SizeConfig.screenWidth! * 0.9,
                           height: SizeConfig.screenHeight! * 0.1,
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(35)),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
+                              const SizedBox(
+                                width: 100,
+                              ),
                               Image.asset("assets/images/money.png",
                                   width: SizeConfig.screenWidth! * 0.11),
+                              const SizedBox(
+                                width: 20,
+                              ),
                               Text(
-                                "\$${total.toStringAsFixed(1)}",
+                                "\$${cubit.total.toStringAsFixed(2)}",
                                 style: const TextStyle(fontSize: 30),
                               )
                             ],
@@ -122,21 +174,85 @@ class MoneyTrackerScreen extends StatelessWidget {
                     const SizedBox(
                       height: 20,
                     ),
-                    SizedBox(
-                      width: SizeConfig.screenWidth! * 0.9,
-                      child: const Text(
-                        "and there's still 18 days left until payday",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold),
-                      ),
+                    const Row(
+                      children: [
+                        Text(
+                          "and there's still 18 days left until payday",
+                          style: TextStyle(
+                              fontSize: 19,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
-                    CustomTextField(name, price, () {
-                      cubit.addToProducts(
-                          "$imageName", name.text, double.parse(price.text));
-                      print("ADD");
-                    }),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    CustomTextField(
+                        text: "enter your category",
+                        controller: nameController),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextField(
+                        text: "enter your price", controller: priceController),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextField(
+                        text: "enter your Image Path",
+                        controller: imageController),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          width: SizeConfig.screenWidth! * 0.3,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: const Color(0xff7cbf86)),
+                          child: MaterialButton(
+                            onPressed: () {
+                              cubit.addToProducts(
+                                  nameController.text,
+                                  double.parse(priceController.text),
+                                  imageController.text);
+                              cubit.total += num.parse(priceController.text);
+                              SharedPreferenceHelper.saveData(
+                                  key: 'total', value: cubit.total);
+                            },
+                            child: const Text("Add",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20)),
+                          ),
+                        ),
+                        Container(
+                          width: SizeConfig.screenWidth! * 0.3,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: const Color(0xff7cbf86)),
+                          child: MaterialButton(
+                            onPressed: () {
+                              double difference = cubit.balance -
+                                  cubit.total; // Calculate the difference
+
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CongratsScreen(
+                                          difference: difference)));
+                            },
+                            child: const Text(
+                              "Next",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 15),
                     const Row(
                       children: [
@@ -165,13 +281,13 @@ class MoneyTrackerScreen extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Image.asset(
-                                    cubit.products[index]['imagePath'],
+                                    cubit.products[index].categoryImage,
                                     width: SizeConfig.screenWidth! * 0.1,
                                     height: SizeConfig.screenHeight! * 0.05,
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    " ${cubit.products[index]['name']}",
+                                    " ${cubit.products[index].category}",
                                     style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold),
@@ -180,7 +296,7 @@ class MoneyTrackerScreen extends StatelessWidget {
                                     height: 48,
                                   ),
                                   Text(
-                                    "-\$ ${cubit.products[index]['price']}",
+                                    "-\$ ${cubit.products[index].price}",
                                     style: const TextStyle(
                                         fontSize: 25,
                                         fontWeight: FontWeight.bold),

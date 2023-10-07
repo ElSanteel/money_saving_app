@@ -1,6 +1,8 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+
+import '../Model/transaction_model.dart';
+import '../service/shared_prefrence_helper.dart';
 
 part 'money_state.dart';
 
@@ -9,50 +11,54 @@ class MoneyCubit extends Cubit<MoneyState> {
 
   static MoneyCubit get(context) => BlocProvider.of(context);
 
-  List products = [
-    {
-      "imagePath": "assets/images/vegetables.png",
-      "name": "Tesco",
-      "price": 8.99
-    },
-    {
-      "imagePath": "assets/images/pet_shop.png",
-      "name": "Pet Shop",
-      "price": 11.30
-    },
-    {
-      "imagePath": "assets/images/vegetables.png",
-      "name": "Toms Vegetables",
-      "price": 3.19
-    },
-    {
-      "imagePath": "assets/images/vegetables.png",
-      "name": "Tesco",
-      "price": 13.45
-    },
-    {"imagePath": "assets/images/bakery.png", "name": "Bakery", "price": 8.99},
-    {
-      "imagePath": "assets/images/bakery.png",
-      "name": "Cakes&Donuts",
-      "price": 11.40
-    },
-    {
-      "imagePath": "assets/images/pharmacy.png",
-      "name": "Pharmacy",
-      "price": 3.19
-    },
+  List<dynamic> products = [
+    TransactionModel(
+        categoryImage: "assets/images/vegetables.png",
+        category: "Tesco",
+        price: 8.99),
+    TransactionModel(
+        categoryImage: "assets/images/pet_shop.png",
+        category: "Pet Shop",
+        price: 11.30),
+    TransactionModel(
+        categoryImage: "assets/images/vegetables.png",
+        category: "Toms Vegetables",
+        price: 3.19),
+    TransactionModel(
+        categoryImage: "assets/images/vegetables.png",
+        category: "Tesco",
+        price: 13.45),
+    TransactionModel(
+        categoryImage: "assets/images/bakery.png",
+        category: "Cakes&Donuts",
+        price: 11.40),
+    TransactionModel(
+        categoryImage: "assets/images/pharmacy.png",
+        category: "Pharmacy",
+        price: 3.19),
   ];
 
-  void addToProducts(String imagePath, String name, double price) {
-    products.add({"imagePath": imagePath, "name": name, "price": price});
+  double total = 0;
+
+  void addToProducts(String product, double price, String image) {
+    final newProduct = TransactionModel(
+      categoryImage: image,
+      category: product,
+      price: price,
+    );
+
+    products.add(newProduct);
     emit(AddToProductsState());
+
+    total = products.fold<double>(0.0, (sum, product) => sum + product.price);
+    SharedPreferenceHelper.saveData(key: 'total', value: total);
   }
 
-  double calculateTotal() {
-    double total = 0;
-    for (var product in products) {
-      total += product['price'];
-    }
-    return total;
+  void resetTotalAndRemoveFromSharedPreferences() {
+    total = 0;
+    emit(TotalState());
+    SharedPreferenceHelper.removeData(key: 'total');
   }
+
+  double balance = 2000;
 }
